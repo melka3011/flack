@@ -14,11 +14,10 @@ users = []
 
 @app.route("/")
 def index():
-    if 'user' in session:
-        return render_template('index.html')
-    else:
-        return redirect(url_for('login'))
+    return render_template('index.html')
 
+
+'''
 @app.route("/login", methods=["POST","GET"])
 def login():
     if request.method == "POST":
@@ -51,19 +50,20 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop('user')
+    g.user = None
+    session.pop('user', None)
     return redirect(url_for('index'))
-'''
+
 @app.route()
 def error(error):
     return render_template('error.html', error=error)
-'''
+
 @app.before_request
 def before_request():
     g.user = None
 
     if 'user' in session:
         g.user = session['user']
-
+'''
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app)
