@@ -1,5 +1,6 @@
-localStorage.setItem("first_name", "Luka");
-    
-alert("Hi, " + localStorage.getItem("first_name"));
-
-alert("Yo");
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('#form').onsubmit = function() {
+        const name = document.querySelector('#displayname').value;
+        localStorage.setItem("displayname", name);
+    };
+});

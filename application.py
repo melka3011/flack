@@ -1,69 +1,42 @@
 import os
 
-from flask import Flask, render_template, request, session, redirect, url_for, g
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO, emit
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 
 app = Flask(__name__)
 app.secret_key = (os.urandom(16))
-socketio = SocketIO(app)
+socketio = SocketIO(app) 
+
+class RegistrationForm(FlaskForm):
+    displayname = StringField('displayname',
+        validators=[
+            InputRequired(message="Displayname Required"),
+            Length(min=4, max=25, message="Display Name must be between 4 and 25 char long")
+        ])
+        
+    def validate_displayname(self, displayname):
+        if displayname.data in users:
+            raise ValidationError('Display Name already exists')
 
 # Keeps track of created channels
 channels = []
 # Keeps track of created user profiles
-users = []
+users = ['Luka','Marko']
 
-@app.route("/")
+@app.route("/", methods=["POST","GET"])
 def index():
-    return render_template('index.html')
+    form = RegistrationForm()
+    if form.validate():
+        users.append(request.form('displayname'))
+        return redirect('/success')
+    return render_template('index.html', form=form)
 
-
-'''
-@app.route("/login", methods=["POST","GET"])
-def login():
-    if request.method == "POST":
-        # Fetches the username from the form
-        new_user = request.form['displayname']
-
-        # Removes existing session
-        session.pop('user', None)
-
-        # Checks for length of username, can't be empty
-        if len(new_user) < 1 or new_user == '':
-            return render_template('error.html', message="Display name can't be empty")
-
-        # Check if the display name is taken
-        if new_user in users:
-            return render_template('error.html', message="User already exists")
-
-        # Add the username to the list of users
-        users.append(new_user)
-
-        # Creates a session with the username
-        session['user'] = new_user
-
-        # Creates a permanent session, keeping user logged in after browser close
-        session.permanent = True
-
-        return redirect(url_for('index'))
-    else:
-        return render_template('login.html')
-
-@app.route("/logout")
-def logout():
-    g.user = None
-    session.pop('user', None)
-    return redirect(url_for('index'))
-
-@app.route()
-def error(error):
-    return render_template('error.html', error=error)
-
-@app.before_request
-def before_request():
-    g.user = None
-
-    if 'user' in session:
-        g.user = session['user']
-'''
+@app.route("/success")
+def success():
+    return "Sucess!"
+    
 if __name__ == '__main__':
     socketio.run(app)
