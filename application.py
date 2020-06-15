@@ -1,42 +1,25 @@
 import os
 
 from flask import Flask, render_template, request, session, redirect, url_for
-from flask_socketio import SocketIO, emit
-from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
+from flask_socketio import SocketIO, emit, send, join_room, leave_room
 
 app = Flask(__name__)
 app.secret_key = (os.urandom(16))
 socketio = SocketIO(app) 
 
-class RegistrationForm(FlaskForm):
-    displayname = StringField('displayname',
-        validators=[
-            InputRequired(message="Displayname Required"),
-            Length(min=4, max=25, message="Display Name must be between 4 and 25 char long")
-        ])
-        
-    def validate_displayname(self, displayname):
-        if displayname.data in users:
-            raise ValidationError('Display Name already exists')
-
 # Keeps track of created channels
-channels = []
+channels = {}
 # Keeps track of created user profiles
 users = ['Luka','Marko']
 
-@app.route("/", methods=["POST","GET"])
+@app.route("/")
 def index():
-    form = RegistrationForm()
-    if form.validate():
-        users.append(request.form('displayname'))
-        return redirect('/success')
-    return render_template('index.html', form=form)
+    return render_template('index.html')
 
-@app.route("/success")
-def success():
-    return "Sucess!"
-    
+@socketio.on('message')
+def handle_message(message):
+    print('received message: ' + message)
+    send(message, broadcast=True)
+
 if __name__ == '__main__':
     socketio.run(app)

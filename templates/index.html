@@ -3,27 +3,7 @@
 {% block title %}Flack{% endblock%}
 
 {%block content%}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
-            <div class="card card-signin my-5">
-            <div class="card-body">
-                <h5 class="card-title text-center">Choose a Display Name</h5>
-                <form class="form-signin" id="form" method="POST" action="/">
-                <div class="form-label-group">
-                    <label for='displayname'> Display Name</label>
-                    {{ form.displayname(class_='form-control', placeholder='Display Name', id='displayname')}}
-                    <ul>
-                        {% for error in form.displayname.errors %}
-                            <li>{{error}}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Go to chatrooms</button>
-                </form>
-            </div>
-            </div>
-        </div>
-    </div>
-</div>
+<ul id="messages"></ul>
+<input type="text" id="myMessage">
+<button id="sendbutton">Send</button>
 {% endblock%}
