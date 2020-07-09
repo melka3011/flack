@@ -15,18 +15,31 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("login_wrapper").style.display = 'flex';
             document.getElementById("chatwindow").style.display = 'none';
 
+            return false;
         };
         if (!user_storage.getItem('channel')){
-            user_storage.setItem('channel','/general')
+            user_storage.setItem('channel','General')
         }
-        
-        // TODO set general chatroom if no chatroom selected
+
     });
 
-    socket.on('message', function(message) {
+    socket.on('msg', function(data) {
 
-            const li = document.createElement('li');
-            li.innerHTML = message;
+            const div = document.createElement('div');
+            const div_msg = document.createElement('div');
+            const div_img = document.createElement('div');
+
+            //Checks if the message is from user or from someone else and puts the message from user to the right, others to the left
+            if(data['user']==user_storage['displayname']){
+                div.className = 'd-flex justify-content-end mb-4';
+                div_msg.className = 'msg_cotainer_send';
+            }
+            else{
+                div.className = 'd-flex justify-content-start mb-4';
+                div_msg.className = 'msg_cotainer';
+            }
+            div_img.className = 'img_cont_msg';
+            
 
             document.querySelector("#messages").append(li);
 
@@ -44,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else{
             //add user to local storage and enable chatrooms
             user_storage.setItem('displayname', data['displayname']);
-            user_storage.setItem('channel', '/general');
+            user_storage.setItem('channel', 'General');
 
             document.getElementById("login_wrapper").style.display = 'none';
             document.getElementById("chatwindow").style.display = 'flex';
@@ -57,8 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#sendbutton').onclick = () => {
 
             const msg = document.querySelector('#myMessage').value;
-
-            socket.send(msg);
+            const user = user_storage.getItem('displayname');
+            const current_channel = user_storage.getItem('channel');
+            const time = new Date().toLocaleString();
+            console.log(msg,user,current_channel,time)
+            socket.emit('message',{'msg':msg,'user':user,'current':current_channel,'time':time});
             
             document.querySelector('#myMessage').value = '';
     };

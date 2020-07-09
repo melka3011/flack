@@ -2,25 +2,39 @@ import os
 
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO, emit, send, join_room, leave_room
+import json
 
 app = Flask(__name__)
 app.secret_key = (os.urandom(16))
 socketio = SocketIO(app) 
 
-# Keeps track of created channels
-channels = {}
-# Keeps track of created user profiles
-users = ['Luka','Marko']
+# Keeps track of created channels and all messages
+channels = {'General':[]}
+# Keeps track of just the channel names
+channel_list = []
+# Keeps track of created user profiles and their sid's
+users = {}
+limit = 100
 
 @app.route("/")
 def index():
     return render_template('index.html')
 
-# flask socketio's message handler
 @socketio.on('message')
-def handle_message(message):
-    print('received message: ' + message)
-    send(message, broadcast=True)
+def handle_msg(json_data):
+    try:
+        data = json_data
+        channel = data['current']
+        print(channel)
+        message = {'text':data['msg'],'user':data['user'],'time':data['time']}
+        # Need to create a channel as a list to be able to append
+        channels[channel].append(message)
+        print(channels)
+        if len(channels[channel])>limit:
+            channels[channel].pop(0)
+        emit('msg',{'user':message['user'],'text':message['text'],'time':message['time'],'channel':channel})
+    except TypeError:
+        pass
 
 @socketio.on('new_user')
 def new_user(data):
@@ -30,9 +44,23 @@ def new_user(data):
         error = 'Display name already in use. Please try another one,'
     else:
         error = ''
-        users.append(displayname)
+        users[displayname] = request.sid
+        print (users)
     emit('add_user',{'displayname':displayname,'error':error})
 
+@socketio.on('join')
+def on_join(data):
+    username = data['displayname']
+    room = data['channel']
+    join_room(room)
+    send(username + ' has entered the room.', room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['displayname']
+    room = data['channel']
+    leave_room(room)
+    send(username + ' has left the room.', room=room)
 
 if __name__ == '__main__':
     socketio.run(app)
