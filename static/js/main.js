@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const active_channel = user_storage.getItem('channel')
         const time = new Date().toLocaleString();
 
-        socket.emit('join',{'channel':active_channel,'message':'has joined the room','displayname':displayname,'time':time};)
+        socket.emit('join',{'channel':active_channel,'message':'has joined the room','displayname':displayname,'time':time});
 
     });
 
