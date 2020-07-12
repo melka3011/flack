@@ -20,6 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!user_storage.getItem('channel')){
             user_storage.setItem('channel','General')
         }
+        const displayname = user_storage.getItem('displayname');
+        const active_channel = user_storage.getItem('channel')
+        const time = new Date().toLocaleString();
+
+        socket.emit('join',{'channel':active_channel,'message':'has joined the room','displayname':displayname,'time':time};)
 
     });
 
@@ -28,20 +33,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             const div_msg = document.createElement('div');
             const div_img = document.createElement('div');
+            const span = document.createElement('span');
 
             //Checks if the message is from user or from someone else and puts the message from user to the right, others to the left
             if(data['user']==user_storage['displayname']){
                 div.className = 'd-flex justify-content-end mb-4';
                 div_msg.className = 'msg_cotainer_send';
+                span.className = 'msg_time_send';
             }
             else{
                 div.className = 'd-flex justify-content-start mb-4';
                 div_msg.className = 'msg_cotainer';
+                span.className = 'msg_time';
             }
-            div_img.className = 'img_cont_msg';
             
-
-            document.querySelector("#messages").append(li);
+            span.innerHTML = data['time'];
+            div_img.className = 'img_cont_msg';
+            div_msg.innerHTML = data['text'];
+            
+            div_msg.appendChild(span);
+            div.appendChild(div_img);
+            div.appendChild(div_msg);
+            
+            document.querySelector("#messages").appendChild(div);
 
             return false;
     });
@@ -98,5 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
-
+//function loadMessages(data){
+    // for message in channel create div element like in msg socket
+//}
 //localStorage.setItem("displayname", name)

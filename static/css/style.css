@@ -434,6 +434,9 @@ input[type=text]:placeholder {
   bottom: -15px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 10px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .msg_time_send {
@@ -442,6 +445,9 @@ input[type=text]:placeholder {
   bottom: -15px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 10px;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .msg_head {
