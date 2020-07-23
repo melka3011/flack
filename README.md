@@ -1,3 +1,3 @@
-# Project 2
+# Chatroom app
 
-Web Programming with Python and JavaScript
+Chatroom app running on flask and socketio
