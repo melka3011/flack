@@ -78,9 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     socket.on('disconnect', () => {
-        socket.send('user disconnected');
+        socket.emit('msg',{'text':'user disconnected','user':user_storage.getItem('displayname'),'time':''});
     });
-
+    socket.on('joined', function(data){
+        
+    });
     document.querySelector('#sendbutton').onclick = () => {
 
             const msg = document.querySelector('#myMessage').value;
@@ -96,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#logout').onclick = () => {
         // clears the whole user local storage    
         localStorage.clear();
-        socket.emit('disconnect',{'msg':'user disconnected'});
+        socket.emit('disconnect');
         location.reload();
 
     };

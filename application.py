@@ -32,7 +32,7 @@ def handle_msg(json_data):
         print(channels)
         if len(channels[channel])>limit:
             channels[channel].pop(0)
-        emit('msg',{'user':message['user'],'text':message['text'],'time':message['time'],'channel':channel})
+        emit('msg',{'user':message['user'],'text':message['text'],'time':message['time'],'channel':channel},room=channel)
     except TypeError:
         pass
 
@@ -53,14 +53,14 @@ def on_join(data):
     username = data['displayname']
     room = data['channel']
     join_room(room)
-    send(username + ' has entered the room.', room=room)
+    emit('msg',{'text':username + ' has entered the room.','user':username,'time':''}, room=room)
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['displayname']
     room = data['channel']
     leave_room(room)
-    send(username + ' has left the room.', room=room)
+    emit('msg',{'text':username + ' has left the room.','user':username,'time':''}, room=room)
 
 if __name__ == '__main__':
     socketio.run(app)
